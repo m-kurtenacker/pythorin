@@ -65,9 +65,15 @@ class Thorin:
         with open(module_file) as f:
             extern_module = json.load(f)
 
+        imported_type_table = {}
+        for extern_type in extern_module["type_table"]:
+            imported_type_table.update(ThorinType.import_type(extern_type, imported_type_table))
+
         for definition in extern_module["defs"]:
             if "internal" in definition:
-                imported_def = ThorinContinuation(ThorinFnType([]), internal=definition["internal"]) # XXX: These continuations can only be used in a specific order with the imported files!
+                imported_type = imported_type_table[definition["fn_type"]]
+
+                imported_def = ThorinContinuation(imported_type, internal=definition["internal"]) # XXX: These continuations can only be used in a specific order with the imported files!
                 self.imported_definitions.update({definition["internal"]: imported_def})
 
     def find_imported_def(self, function_name):
