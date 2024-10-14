@@ -13,6 +13,7 @@ class Thorin:
         self.compiled = False
         self.module_target = module
         self.imported_definitions = {}
+        self.keep = os.environ.get("KEEP_BUILD_FILES")
 
     #TODO: Use the thorin world for caching, don't cache information about the world inside defs.
     def __enter__(self):
@@ -26,8 +27,8 @@ class Thorin:
                 json.dump(self.module, f, indent=2)
 
     def __del__(self):
-        keep = os.environ.get("KEEP_BUILD_FILES")
-        if (keep is None or keep == "0") and self.module_target and self.compiled:
+        #XXX: I have observed os to be none here, this might turn into a problem
+        if (self.keep is None or self.keep == "0") and self.module_target and self.compiled:
             os.remove(self.module_name + ".thorin.json")
             os.remove(self.module_name + ".ll")
             os.remove(self.module_name + ".so")
