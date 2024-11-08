@@ -283,7 +283,7 @@ class ThorinVariantType(ThorinType):
 
             return old_entry
         else:
-            return ThorinStructType(variant_name)
+            return ThorinVariantType(variant_name)
 
 
 class ThorinTupleType(ThorinType):
