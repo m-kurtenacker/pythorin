@@ -103,9 +103,15 @@ class ThorinBottomType(ThorinType):
 
 
 class ThorinFnType(ThorinType):
+    #TODO: always add a mem argument; with an option to disable it if needed.
+    #Rationale: All explicit instances that I use end up using a mem argument anyways.
     def __init__(self, args, return_type=None):
         super().__init__()
-        self.args = args
+        if len(args) == 1 and isinstance(args[0], ThorinTupleType):
+            self.args = args[0].args
+        else:
+            self.args = args
+
         if return_type is not None:
             mem_type = ThorinMemType()
             if return_type == True:

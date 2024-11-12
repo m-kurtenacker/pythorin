@@ -117,7 +117,6 @@ class ThorinContinuation(ThorinDef):
         self.external = external
         self.internal = internal
         self.intrinsic = intrinsic
-        self.app = app
         self.filter = filter
         self.thorin = thorin
 
@@ -127,6 +126,18 @@ class ThorinContinuation(ThorinDef):
             new_parameter = ThorinParameter(self, i)
             self.parameters.append(new_parameter)
 
+        if app is not None and (len(app[1]) == 2 or len(app[1]) == 3) and isinstance(app[1][1], ThorinTuple):
+            args = app[1]
+            newargs = []
+            newargs.append(args[0])
+            for arg in args[1].args:
+                newargs.append(arg)
+            if len(args) == 3:
+                newargs.append(args[2])
+            self.app = (app[0], newargs)
+        else:
+            self.app = app
+
     def __enter__(self):
         return (self, *self.parameters)
 
@@ -135,7 +146,16 @@ class ThorinContinuation(ThorinDef):
             self.thorin.add_def(self)
 
     def __call__(self, target, *args):
-        self.app = (target, args)
+        if (len(args) == 2 or len(args) == 3) and isinstance(args[1], ThorinTuple):
+            newargs = []
+            newargs.append(args[0])
+            for arg in args[1].args:
+                newargs.append(arg)
+            if len(args) == 3:
+                newargs.append(args[2])
+            self.app = (target, newargs)
+        else:
+            self.app = (target, args)
 
     def compile(self, module):
         def_table = module["defs"]
